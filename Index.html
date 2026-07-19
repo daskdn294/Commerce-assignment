@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year 10 Commerce Interdependence Assignment</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary: #0a2540;
+            --accent-blue: #2563eb;
+            --accent-gold: #d97706;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 15px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .badge {
+            background-color: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.8rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media(min-width: 900px) {
+            .main-container {
+                grid-template-columns: 1.1fr 0.9fr;
+            }
+        }
+
+        /* --- CLUSTER FLOW MODEL --- */
+        .interactive-map-box {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .map-instruction {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .flow-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .sector-node {
+            background: #f8fafc;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100px;
+        }
+
+        .sector-node:hover {
+            background: #f1f5f9;
+            border-color: var(--accent-blue);
+        }
+
+        .sector-node.active {
+            background: #dbeafe;
+            border-color: var(--accent-blue);
+        }
+
+        .sector-node h3 {
+            font-size: 0.95rem;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .sector-node span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        #node-producer1 { grid-column: 1; grid-row: 1; }
+        #node-government { grid-column: 2; grid-row: 1; }
+        #node-producer2 { grid-column: 3; grid-row: 1; }
+        #node-financial { grid-column: 1; grid-row: 2; }
+        
+        #node-household { 
+            grid-column: 2; 
+            grid-row: 2; 
+            background: #fff7ed;
+            border-color: var(--accent-gold);
+        }
+
+        #node-overseas { grid-column: 2; grid-row: 3; }
+
+        .flow-legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+        }
+
+        .line-real { width: 20px; height: 4px; background: var(--accent-blue); display: inline-block;}
+        .line-money { width: 20px; height: 4px; background: var(--accent-gold); display: inline-block;}
+
+        /* --- SIDE DETAILS PANEL --- */
+        .analysis-panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .dynamic-card {
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            background: #f8fafc;
+            margin-top: 10px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .flow-direction-box {
+            margin-top: 10px;
+            background: white;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .flow-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .real-text { color: var(--accent-blue); }
+        .money-text { color: var(--accent-gold); }
+
+        /* --- REPORT WRITEOUT --- */
+        .report-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            grid-column: 1 / -1;
+        }
+
+        .report-section h2 {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media(min-width: 768px) {
+            .report-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .report-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .report-card h3 {
+            margin-bottom: 10px;
+            color: #1e40af;
+        }
+
+        .report-card ul {
+            padding-left: 15px;
+        }
+
+        .report-card li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Interdependence of Sectors in the New Zealand Economy</h1>
+        <p>Commerce Presentation Model - Family Connections</p>
+        <span class="badge">Botany Downs Secondary College • Year 10 BUP Assessment</span>
+    </header>
+
+    <div class="main-container">
+        
+        <!-- MODEL CONTAINER -->
+        <section class="interactive-map-box">
+            <h2>Circular Flow Diagram</h2>
+            <div class="map-instruction">
+                Click on the boxes below to see how our family connects to different parts of the economy!
+            </div>
+
+            <div class="flow-grid">
+                <div class="sector-node" id="node-producer1" onclick="selectSector('producer1')">
+                    <h3>Producer 1 (Employer)</h3>
+                    <span>NZ Police</span>
+                </div>
+                <div class="sector-node" id="node-government" onclick="selectSector('government')">
+                    <h3>Government</h3>
+                    <span>Council & State</span>
+                </div>
+                <div class="sector-node" id="node-producer2" onclick="selectSector('producer2')">
+                    <h3>Producer 2 (Retail)</h3>
+                    <span>Woolworths / Pak n Save</span>
+                </div>
+
+                <div class="sector-node" id="node-financial" onclick="selectSector('financial')">
+                    <h3>Financial Sector</h3>
+                    <span>ASB Bank</span>
+                </div>
+                <div class="sector-node" id="node-household" onclick="selectSector('household')">
+                    <h3>Our Household</h3>
+                    <span>The Family</span>
+                </div>
+
+                <div class="sector-node" id="node-overseas" onclick="selectSector('overseas')">
+                    <h3>Overseas Sector</h3>
+                    <span>Global Trade</span>
+                </div>
+            </div>
+
+            <div class="flow-legend">
+                <div><span class="line-real"></span> Real Flows (Labor, Skills, Goods)</div>
+                <div><span class="line-money"></span> Money Flows (Wages, Spending, Taxes)</div>
+            </div>
+        </section>
+
+        <!-- DYNAMIC ANALYSIS BOX -->
+        <section class="analysis-panel">
+            <h2>Sector Relationships</h2>
+            <div id="dynamic-content">
+                <p style="color: var(--text-muted); text-align: center; padding-top: 30px;">Click any sector box to see the exact real and money flows for our household.</p>
+            </div>
+        </section>
+
+        <!-- WRITEOUT EVALUATION REPORT -->
+        <section class="report-section">
+            <h2>Task 2 Written Explanation</h2>
+            
+            <div class="report-grid">
+                <div class="report-card">
+                    <h3>Interdependence with the Producer Sector</h3>
+                    <p>Our household interacts with the producer sector in two completely different ways, showing we depend on each other:</p>
+                    <br>
+                    <ul>
+                        <li><strong>As Employees (NZ Police):</strong> My parent works for the NZ Police. The real flow here is the hard work and skills they give to the job, like understanding criminal law, managing multiple stations, and running district operations during big events. In exchange, the money flow is the salary the NZ Police pays to our household so we can survive. The police needs our labor to achieve organisation goals, and we need their money!</li>
+                        <li><strong>As Consumers (Woolworths, Pak n Save, BP):</strong> We rely on supermarkets and shops for things we need every week. The money flow goes from our household using credit cards or online banking to pay them. The real flow is the actual groceries, petrol, and broadband internet (from 2degrees) they give back to us. The firms need our spending to make a profit, and we need their goods.</li>
+                    </ul>
+                </div>
+
+                <div class="report-card">
+                    <h3>Interdependence with Other Sectors</h3>
+                    <p>Here is how our household depends on the Financial and Government sectors:</p>
+                    <br>
+                    <ul>
+                        <li><strong>Financial Sector (ASB Bank):</strong> We use ASB bank as our main financial institution for storing our money safely and getting a mortgage. The money flow from us to them is the fees and interest payments on the mortgage. The real flow is the safety they provide because of banking regulations, plus financial advice and the loan itself. They rely on us putting salary into the bank, and we rely on them for buying our house.</li>
+                        <li><strong>Government Sector:</strong> The money flow from our household is income tax deducted straight from my parents salaries. The real flow we get back from the government is public services like schooling, roads, and healthcare. The Auckland City Council also provides rubbish and water services using these funds. The government needs our taxes to run the country, and we need their services to live safely.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const sectorData = {
+            producer1: {
+                title: "Household ⇆ NZ Police (Employer)",
+                reliesOnUs: "<strong>How they rely on us:</strong> The NZ Police needs our family member's skills to function. They rely on their leadership, knowledge of criminal law, and operational experience to manage police stations and manage big crowds or protests.",
+                weRelyOnThem: "<strong>How we rely on them:</strong> Our household relies on the police force to pay us a salary every month so we can pay for our living costs.",
+                realFlow: "💼 <strong>Real Flow:</strong> Leadership, policing knowledge, and operational skills go from Household ➔ NZ Police.",
+                moneyFlow: "💰 <strong>Money Flow:</strong> Regular salary payments go from NZ Police ➔ Household."
+            },
+            producer2: {
+                title: "Household ⇆ Retail Outlets (Woolworths, Pak n Save, etc)",
+                reliesOnUs: "<strong>How they rely on us:</strong> These businesses need our consumer spending money so they can stay open and make money.",
+                weRelyOnThem: "<strong>How we rely on them:</strong> We rely on them to provide food, petrol for cars, and internet connections.",
+                realFlow: "🛒 <strong>Real Flow:</strong> Food groceries, fuel, and broadband internet services go from Retailers ➔ Household.",
+                moneyFlow: "💳 <strong>Money Flow:</strong> Money spent via credit cards, online banking, and direct debits go from Household ➔ Retailers."
+            },
+            government: {
+                title: "Household ⇆ Government & Council",
+                reliesOnUs: "<strong>How they rely on us:</strong> They need the income tax taken out of our wages so they have funds to run public services.",
+                weRelyOnThem: "<strong>How we rely on them:</strong> We rely on them to fix roads, provide schools, run public healthcare, and take away rubbish and sewage.",
+                realFlow: "🛣️ <strong>Real Flow:</strong> Schooling, healthcare, water infrastructure, and emergency services go from Gov ➔ Household.",
+                moneyFlow: "📉 <strong>Money Flow:</strong> Income tax payments go from Household ➔ Government."
+            },
+            financial: {
+                title: "Household ⇆ ASB Bank / Police Association",
+                reliesOnUs: "<strong>How they rely on us:</strong> ASB relies on us putting our salary directly into their bank accounts and paying fees or interest on our mortgage loan.",
+                weRelyOnThem: "<strong>How we rely on them:</strong> We rely on them for a safe place to store our personal finance and to give us a mortgage. We also get insurance through the Police Association.",
+                realFlow: "🛡️ <strong>Real Flow:</strong> Safe money storage, house mortgage loans, and insurance cover go from Financial institutions ➔ Household.",
+                moneyFlow: "🏦 <strong>Money Flow:</strong> Salary deposits, fees, and mortgage interest payments go from Household ➔ Bank."
+            },
+            overseas: {
+                title: "Household ⇆ Overseas Sector",
+                reliesOnUs: "<strong>How they rely on us:</strong> International brands need Kiwi families to buy their goods online or in stores so they can expand their market.",
+                weRelyOnThem: "<strong>How we rely on them:</strong> We rely on other countries for petrol, clothes, everyday kitchen utensils, and digital storage or gaming subscriptions on our devices.",
+                realFlow: "✈️ <strong>Real Flow:</strong> Imported clothes, petrol fuel, utensils, and digital device cloud subscriptions come from Overseas ➔ Household.",
+                moneyFlow: "🌐 <strong>Money Flow:</strong> Payments for online shopping and subscriptions go from Household ➔ Overseas companies."
+            },
+            household: {
+                title: "The Household Unit",
+                reliesOnUs: "<strong>Central Hub:</strong> The household is the main circle of the whole economic flow. We give labor to employers and spend our money at businesses.",
+                weRelyOnThem: "<strong>System Dependency:</strong> Everything is connected. If the bank stops our card or the police stop paying salary, we can't buy food from the producer sector.",
+                realFlow: "🔄 <strong>Real Flow Summary:</strong> We give out labor/skills and buy items back.",
+                moneyFlow: "🔄 <strong>Money Flow Summary:</strong> We earn income and pay it out to shops, banks, and taxes."
+            }
+        };
+
+        function selectSector(sectorKey) {
+            document.querySelectorAll('.sector-node').forEach(node => {
+                node.classList.remove('active');
+            });
+            
+            document.getElementById(`node-${sectorKey}`).classList.add('active');
+            
+            const data = sectorData[sectorKey];
+            const panel = document.getElementById('dynamic-content');
+            
+            panel.innerHTML = `
+                <h3 style="margin-bottom:10px; color:var(--primary);">${data.title}</h3>
+                <div class="dynamic-card">
+                    <p style="font-size:0.9rem;">${data.reliesOnUs}</p>
+                </div>
+                <div class="dynamic-card" style="border-left-color: var(--accent-gold);">
+                    <p style="font-size:0.9rem;">${data.weRelyOnThem}</p>
+                </div>
+                <div class="flow-direction-box">
+                    <div class="flow-title real-text">Real Flow Matrix</div>
+                    <p style="font-size: 0.85rem;">${data.realFlow}</p>
+                </div>
+                <div class="flow-direction-box">
+                    <div class="flow-title money-text">Money Flow Matrix</div>
+                    <p style="font-size: 0.85rem;">${data.moneyFlow}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
